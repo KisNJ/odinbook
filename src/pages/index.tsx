@@ -1,11 +1,10 @@
 import type { NextPage } from "next";
 import { signIn, useSession, signOut } from "next-auth/react";
 import Head from "next/head";
-import { trpc } from "../utils/trpc";
+
 import Router from "next/router";
 
 const Home: NextPage = () => {
-  const hello = trpc.useQuery(["example.hello", { text: "from tRPC" }]);
   const { data: session, status } = useSession();
   if (status === "loading") {
     return <main>Loading...</main>;

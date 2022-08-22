@@ -44,16 +44,17 @@ model User {
     accounts Account[]
     sessions Session[]
 
-    firends      User[]  @relation("friendActual")
-    frienddUser  User?   @relation("friendActual", fields: [userFriendId], references: [id])
+    friends      User[]  @relation("friendActual")
+    friendUser   User?   @relation("friendActual", fields: [userFriendId], references: [id])
     userFriendId String?
 
-    firendRequests      User[]    @relation("friendRequest")
-    firnedUser          User?     @relation("friendRequest", fields: [userFriendRequestId], references: [id])
+    friendRequests      User[]  @relation("friendRequest")
+    friendRequestUser   User?   @relation("friendRequest", fields: [userFriendRequestId], references: [id])
     userFriendRequestId String?
-    posts               Post[]    @relation("author")
-    comments            Comment[]
-    likedPosts          Post[]    @relation("likes")
+
+    posts      Post[]    @relation("author")
+    comments   Comment[]
+    likedPosts Post[]    @relation("likes")
 }
 
 enum Role {
@@ -62,25 +63,28 @@ enum Role {
 }
 
 model Post {
-    id       String    @id @default(cuid())
-    author   User      @relation("author", fields: [userId], references: [id])
-    comments Comment[]
-    likes    User[]    @relation("likes")
-    userId   String
-    type     Role      @default(FRIENDSONLY)
-    title    String
-    content  String
+    id        String    @id @default(cuid())
+    author    User      @relation("author", fields: [userId], references: [id])
+    comments  Comment[]
+    likes     User[]    @relation("likes")
+    userId    String
+    type      Role      @default(FRIENDSONLY)
+    title     String
+    content   String
+    location  String    @default("NONE GIVEN")
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
 }
 
 model Comment {
-    id         String   @id @default(cuid())
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
-    Post       Post?    @relation(fields: [postId], references: [id])
-    postId     String?
-    author     User     @relation(fields: [userId], references: [id])
-    userId     String
-    content    String
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    post      Post?    @relation(fields: [postId], references: [id])
+    postId    String?
+    author    User     @relation(fields: [userId], references: [id])
+    userId    String
+    content   String
 }
 
 model VerificationToken {
