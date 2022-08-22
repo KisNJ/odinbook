@@ -1,12 +1,31 @@
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import React from "react";
+import Router from "next/router";
+import React, { useState } from "react";
 import Header from "../components/Header";
+import { trpc } from "../utils/trpc";
 
 const createpost = () => {
   const { data: session, status } = useSession();
+  const createPost = trpc.useMutation("post.createPost");
+  const [formData, setFormData] = useState({
+    title: "",
+    location: "",
+    content: "",
+  });
   if (status === "loading") {
     return <main>Loading...</main>;
+  }
+
+  function handleSubmit(e: React.SyntheticEvent) {
+    e.preventDefault();
+    createPost.mutate(formData);
+    Router.push("/");
+  }
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) {
+    setFormData((old) => ({ ...old, [e.target.id]: e.target.value }));
   }
   return (
     <div>
@@ -25,26 +44,35 @@ const createpost = () => {
               type="text"
               name="location"
               placeholder="Texas, USA"
+              id="location"
+              value={formData.location}
+              onChange={handleChange}
               className="border-neutral-800 border-2 rounded-md shadow-md p-2"
             />
           </div>
         </div>
         <label htmlFor="title" className="font-bold text-3xl">
-          Title
+          Title*
         </label>
         <input
           className="border-neutral-800 border-spacing-1 border-2 rounded-md shadow-md p-2 mx-15 self-stretch"
           type="text"
           id="title"
+          required
+          value={formData.title}
+          onChange={handleChange}
         />
         <label htmlFor="content" className="font-bold text-3xl">
-          Content
+          Content*
         </label>
         <textarea
           className="border-neutral-800 border-spacing-1 border-2 rounded-md shadow-md p-2 mx-15 self-stretch"
           id="content"
+          required
+          value={formData.content}
+          onChange={handleChange}
         />
-        <button>Post</button>
+        <button onClick={handleSubmit}>Post</button>
       </div>
     </div>
   );

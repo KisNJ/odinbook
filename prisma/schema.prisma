@@ -57,10 +57,10 @@ model User {
     likedPosts Post[]    @relation("likes")
 }
 
-enum Role {
-    PUBLIC
-    FRIENDSONLY
-}
+// enum Role {
+//     PUBLIC
+//     FRIENDSONLY
+// }
 
 model Post {
     id        String    @id @default(cuid())
@@ -68,10 +68,9 @@ model Post {
     comments  Comment[]
     likes     User[]    @relation("likes")
     userId    String
-    type      Role      @default(FRIENDSONLY)
     title     String
     content   String
-    location  String    @default("NONE GIVEN")
+    location  String
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
 }
