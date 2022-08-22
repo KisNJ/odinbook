@@ -1,0 +1,92 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// Necessary for Next auth
+model Account {
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+    id            String    @id @default(cuid())
+    name          String?
+    email         String?   @unique
+    emailVerified DateTime?
+    image         String?
+
+    accounts Account[]
+    sessions Session[]
+
+    firends      User[]  @relation("friendActual")
+    frienddUser  User?   @relation("friendActual", fields: [userFriendId], references: [id])
+    userFriendId String?
+
+    firendRequests      User[]    @relation("friendRequest")
+    firnedUser          User?     @relation("friendRequest", fields: [userFriendRequestId], references: [id])
+    userFriendRequestId String?
+    posts               Post[]    @relation("author")
+    comments            Comment[]
+    likedPosts          Post[]    @relation("likes")
+}
+
+enum Role {
+    PUBLIC
+    FRIENDSONLY
+}
+
+model Post {
+    id       String    @id @default(cuid())
+    author   User      @relation("author", fields: [userId], references: [id])
+    comments Comment[]
+    likes    User[]    @relation("likes")
+    userId   String
+    type     Role      @default(FRIENDSONLY)
+    title    String
+    content  String
+}
+
+model Comment {
+    id         String   @id @default(cuid())
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+    Post       Post?    @relation(fields: [postId], references: [id])
+    postId     String?
+    author     User     @relation(fields: [userId], references: [id])
+    userId     String
+    content    String
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
