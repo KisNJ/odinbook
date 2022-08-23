@@ -1,7 +1,7 @@
 import { createProtectedRouter } from "./protected-router";
-import { object, z } from "zod";
+import { z } from "zod";
 import * as trpc from "@trpc/server";
-import { resolve } from "path";
+
 export const postRouter = createProtectedRouter()
   .mutation("createPost", {
     input: z.object({
@@ -115,7 +115,7 @@ export const postRouter = createProtectedRouter()
   })
   .mutation("createComment", {
     input: z.object({
-      postId: z.string(),
+      postId: z.string().cuid(),
       content: z.string(),
       idNew: z.string(),
     }),

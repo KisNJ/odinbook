@@ -30,12 +30,20 @@ export const mainPageRouter = createProtectedRouter()
               },
             ],
           },
+          orderBy: [
+            {
+              createdAt: "desc",
+            },
+          ],
           include: {
             author: true,
             // comments: true,
             comments: {
               include: {
                 author: true,
+              },
+              orderBy: {
+                createdAt: "desc",
               },
             },
             likes: true,

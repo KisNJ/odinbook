@@ -12,7 +12,9 @@ const Post = ({
 }: {
   post: Post & {
     author: User;
-    comments: Comment[];
+    comments: (Comment & {
+      author: User;
+    })[];
     likes: User[];
   };
 }) => {
@@ -121,9 +123,7 @@ const Post = ({
     onMutate: () => {
       ctx.cancelQuery(["main.posts"]);
       let optimisticUpdate = ctx.getQueryData(["main.posts"]);
-      let index = optimisticUpdate?.posts.findIndex(
-        (posta) => posta.id === post.id,
-      );
+
       optimisticUpdate!.posts = optimisticUpdate!.posts.filter((posta) => {
         return post.id !== posta.id;
       });

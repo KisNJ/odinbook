@@ -14,7 +14,6 @@ const mainpage = () => {
   return (
     <>
       <Header />
-      <div>{JSON.stringify(session)}</div>
       {posts.data?.posts.map((post) => (
         <Post post={post} key={post.id} />
       ))}

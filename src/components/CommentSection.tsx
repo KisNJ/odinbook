@@ -1,17 +1,20 @@
-import { Comment } from "@prisma/client";
+import { Comment, User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
-import { BsBoxArrowUpRight } from "react-icons/bs";
+import { BsBoxArrowUpRight, BsThreeDots, BsTrash } from "react-icons/bs";
 import { trpc } from "../utils/trpc";
 import cuid from "cuid";
-import { TbOld } from "react-icons/tb";
+import { TbArrowForwardUp, TbOld } from "react-icons/tb";
+import Image from "next/image";
 
 const CommentSection = ({
   comments,
   postId,
   expandMaxHeight,
 }: {
-  comments: Comment[];
+  comments: (Comment & {
+    author: User;
+  })[];
   postId: string;
   expandMaxHeight: boolean;
 }) => {
@@ -62,6 +65,7 @@ const CommentSection = ({
       postId,
     });
   }
+  if (status === "loading") return <div>Loading ...</div>;
   return (
     <>
       <label htmlFor="content" className="font-bold text-xl">
@@ -90,13 +94,162 @@ const CommentSection = ({
         } overflow-y-auto max-w-full overflow-x-hidden`}
       >
         {comments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
+          <Comment key={comment.id} comment={comment} postId={postId} />
         ))}
       </div>
     </>
   );
 };
-const Comment = ({ comment }: { comment: Comment }) => {
-  return <div>{JSON.stringify(comment)}</div>;
+const Comment = ({
+  comment,
+  postId,
+}: {
+  comment: Comment & {
+    author: User;
+  };
+  postId: string;
+}) => {
+  const { data: session, status } = useSession();
+  const ctx = trpc.useContext();
+  const [formData, setFormData] = useState({
+    content: comment.content,
+  });
+  const [showUpdate, setShowUpdate] = useState<boolean>(false);
+  const delteComment = trpc.useMutation("post.deleteComment", {
+    onMutate: () => {
+      ctx.cancelQuery(["main.posts"]);
+      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      let indexPost = optimisticUpdate?.posts.findIndex(
+        (posta) => posta.id === postId,
+      );
+      optimisticUpdate!.posts[indexPost as number]!.comments =
+        optimisticUpdate!.posts[indexPost as number]!.comments.filter((c) => {
+          return c.id !== comment.id;
+        });
+      if (optimisticUpdate) {
+        ctx.setQueryData(["main.posts"], optimisticUpdate);
+      }
+      setShowUpdate(false);
+    },
+    onSettled: () => {
+      ctx.invalidateQueries(["main.posts"]);
+    },
+  });
+  function handleDeleteComment() {
+    delteComment.mutate({ commentId: comment.id });
+  }
+  function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setFormData((o) => ({ ...o, content: e.target.value }));
+  }
+  const updateComment = trpc.useMutation("post.updateComment", {
+    onMutate: () => {
+      ctx.cancelQuery(["main.posts"]);
+      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      let indexPost = optimisticUpdate?.posts.findIndex(
+        (posta) => posta.id === postId,
+      );
+      let indexComment = optimisticUpdate!.posts![
+        indexPost as number
+      ]?.comments.findIndex((c) => c.id === comment.id);
+      optimisticUpdate!.posts[indexPost as number]!.comments[
+        indexComment as number
+      ] = {
+        ...optimisticUpdate!.posts[indexPost as number]!.comments[
+          indexComment as number
+        ],
+        content: formData.content,
+      } as unknown as Comment & {
+        author: User;
+      };
+      if (optimisticUpdate) {
+        ctx.setQueryData(["main.posts"], optimisticUpdate);
+      }
+      setShowUpdate(false);
+    },
+    onSettled: () => {
+      ctx.invalidateQueries(["main.posts"]);
+    },
+  });
+  function handleUpdateComment() {
+    updateComment.mutate({ content: formData.content, commentId: comment.id });
+  }
+  if (status === "loading") return <div>Loading ...</div>;
+  return (
+    <div className="max-w-5xl flex flex-col gap-2 bg-sky-300 text-slate-900 px-5 py-10 shadow-xl rounded-md mt-10 mx-20 xl:mx-auto">
+      <div className="flex items-center gap-2">
+        <Image
+          src={comment.author.image as string}
+          width={50}
+          height={50}
+          className="rounded-full shadow-sm"
+        />
+        <div>
+          <div>{comment.author.name}</div>
+        </div>
+        {comment.author.id === session?.user?.id && (
+          <div className="ml-auto mr-5 group relative">
+            <button>
+              <BsThreeDots />
+            </button>
+            <div className="scale-0 group-focus-within:scale-100 absolute bg-gray-100 text-sky-700 right-[-43px] flex flex-col gap-2 truncate mt-1 p-5 rounded-lg shadow-md transition-transform">
+              <button>
+                <div
+                  className="flex items-center gap-2 hover:text-rose-800
+             transition-colors"
+                  onClick={handleDeleteComment}
+                >
+                  Delete <BsTrash />
+                </div>
+              </button>
+              <button>
+                <div
+                  className="
+              flex
+              items-center
+              gap-2
+              hover:text-sky-900
+              transition-colors"
+                  onClick={() => setShowUpdate((o) => !o)}
+                >
+                  {showUpdate ? (
+                    <>
+                      Revert back changes <TbArrowForwardUp />
+                    </>
+                  ) : (
+                    <>
+                      Update <TbArrowForwardUp />
+                    </>
+                  )}
+                </div>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <label htmlFor="content" className="font-bold text-xl">
+        Content
+      </label>
+      {showUpdate ? (
+        <textarea
+          id="content"
+          className="border-neutral-800 border-spacing-1 border-2 rounded-md shadow-md p-2 mx-15 self-stretch"
+          value={formData.content}
+          onChange={handleChange}
+        />
+      ) : (
+        <div className="border-neutral-800 border-spacing-1 border-2 rounded-md shadow-md p-2 mx-15 self-stretch">
+          {comment.content}
+        </div>
+      )}
+      <div className="flex gap-2 items-center">
+        {showUpdate && (
+          <div className="ml-auto mr-5">
+            <button onClick={handleUpdateComment}>Save Updates</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 export default CommentSection;
