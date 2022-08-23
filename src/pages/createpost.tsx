@@ -19,8 +19,11 @@ const createpost = () => {
 
   function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
-    createPost.mutate(formData);
-    Router.push("/");
+    createPost.mutate(formData, {
+      onSuccess: () => {
+        Router.push("/");
+      },
+    });
   }
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

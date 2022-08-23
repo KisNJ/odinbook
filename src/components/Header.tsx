@@ -31,7 +31,7 @@ const Header = ({ back_to_main }: { back_to_main?: boolean }) => {
           <div className="absolute scale-0 group-focus-within:scale-100 bg-gray-100 text-sky-700 p-5 rounded-lg shadow-md right-[-45px] flex flex-col gap-2 truncate transition-transform mt-3">
             <button
               onClick={() => handleSignOut()}
-              className="flex items-center gap-2 hover:text-sky-900 transition-colors"
+              className="flex items-center gap-2 hover:text-rose-800 transition-colors"
             >
               Log out <MdLogout />
             </button>

@@ -10,13 +10,13 @@ const mainpage = () => {
   if (status === "loading") {
     return <main>Loading...</main>;
   }
-  console.log(posts);
+  // console.log(posts);
   return (
     <>
       <Header />
       <div>{JSON.stringify(session)}</div>
       {posts.data?.posts.map((post) => (
-        <Post post={post} />
+        <Post post={post} key={post.id} />
       ))}
     </>
   );
