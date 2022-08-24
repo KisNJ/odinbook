@@ -2,7 +2,7 @@ import React from "react";
 import { useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
 import Header from "../components/Header";
-import Post from "../components/Post";
+import Post from "../components/Posts/Post";
 
 const mainpage = () => {
   const posts = trpc.useQuery(["main.posts"]);
@@ -10,11 +10,10 @@ const mainpage = () => {
   if (status === "loading") {
     return <main>Loading...</main>;
   }
-  // console.log(posts);
   return (
     <>
       <Header />
-      {posts.data?.posts.map((post) => (
+      {posts.data?.posts?.map((post) => (
         <Post post={post} key={post.id} />
       ))}
     </>

@@ -7,6 +7,7 @@ import { trpc } from "../utils/trpc";
 
 import Image from "next/image";
 import { User } from "@prisma/client";
+import Link from "next/link";
 
 function handleSignOut() {
   signOut({ callbackUrl: "/" });
@@ -23,7 +24,7 @@ const UserCard = ({ user }: { user: User }) => {
   }
   return (
     <button onClick={navigate}>
-      <div className="flex items-center  gap-4 bg-sky-300 text-slate-900 px-5 py-1 shadow-xl rounded-md mx-2 hover:bg-sky-500">
+      <div className="flex items-center  gap-4 bg-sky-300 text-slate-900 px-5 py-1 shadow-xl rounded-md mx-2 hover:bg-sky-500 ">
         <Image
           src={user.image as string}
           width={45}
@@ -54,16 +55,20 @@ const Header = ({ back_to_main }: { back_to_main?: boolean }) => {
     }
   }, [searchUserData]);
   return (
-    <header className="bg-sky-700 text-gray-100 flex justify-between items-center px-20 py-5">
-      <h1 className="text-3xl font-bold">{session?.user?.name}</h1>
-      <div className="flex gap-5 items-center relative">
+    <header className="bg-sky-700 text-gray-100 flex justify-between items-center px-20 py-5 w-full">
+      <Link href="/mainpage">
+        <button>
+          <h1 className="text-3xl font-bold">{session?.user?.name}</h1>
+        </button>
+      </Link>
+      <div className="flex gap-5 items-center relative md:basis-[40rem] lg:basis-[60rem] xl:basis-[70rem]">
         <BiSearch size={22} />
         <input
           type="text"
           placeholder="search username"
           value={searchUserData}
           onChange={(e) => setSearchUserData((old) => e.target.value)}
-          className="border-neutral-800 border-spacing-1 border-2 rounded-md shadow-md p-2 mx-15 self-stretch text-slate-900"
+          className="border-neutral-800 border-spacing-1 border-2 rounded-md shadow-md p-2 mx-15 text-slate-900 justify-self-stretch w-full"
         />
         <div className="absolute top-[150%] flex flex-col gap-2 bg-sky-100 py-2 shadow-xl rounded-md">
           {data?.possibleUsers.map((user) => (
@@ -91,9 +96,11 @@ const Header = ({ back_to_main }: { back_to_main?: boolean }) => {
             >
               Log out <MdLogout />
             </button>
-            <button className="hover:text-sky-900 transition-colors">
-              Check Profile
-            </button>
+            <Link href={`/myprofile/${session?.user!.id}`}>
+              <button className="hover:text-sky-900 transition-colors">
+                Check Profile
+              </button>
+            </Link>
           </div>
         </div>
       </div>

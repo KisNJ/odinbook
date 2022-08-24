@@ -83,8 +83,6 @@ export const postRouter = createProtectedRouter()
       } else {
         throw new trpc.TRPCError({ code: "UNAUTHORIZED" });
       }
-      console.log(postTobeDeleted);
-      // if(postTobeDeleted.author.id===ctx.session.user.id)
     },
   })
   .mutation("updatePost", {
@@ -127,7 +125,8 @@ export const postRouter = createProtectedRouter()
         include: {
           author: {
             include: {
-              friends: true,
+              myFriends: true,
+              acceptedMyRequest: true,
             },
           },
         },
@@ -140,13 +139,26 @@ export const postRouter = createProtectedRouter()
       if (postWhereCommentGoes!.author.id === ctx.session.user.id) {
         canComment = true;
       }
-      while (!canComment && i <= postWhereCommentGoes!.author.friends.length) {
+      while (!canComment && i < postWhereCommentGoes!.author.myFriends.length) {
         if (
-          postWhereCommentGoes?.author.friends[i]?.id === ctx.session.user.id
+          postWhereCommentGoes?.author.myFriends[i]?.id === ctx.session.user.id
         ) {
           canComment = true;
         }
         i++;
+      }
+      let k = 0;
+      while (
+        !canComment &&
+        k < postWhereCommentGoes!.author.acceptedMyRequest.length
+      ) {
+        if (
+          postWhereCommentGoes?.author.acceptedMyRequest[k]?.id ===
+          ctx.session.user.id
+        ) {
+          canComment = true;
+        }
+        k++;
       }
       if (canComment) {
         await ctx.prisma.comment.create({

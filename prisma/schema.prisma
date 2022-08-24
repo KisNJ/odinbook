@@ -44,13 +44,16 @@ model User {
     accounts Account[]
     sessions Session[]
 
-    friends      User[]  @relation("friendActual")
-    friendUser   User?   @relation("friendActual", fields: [userFriendId], references: [id])
-    userFriendId String?
+    sentFriendRequests User[] @relation("friendRequests")
+    friendRequests     User[] @relation("friendRequests")
 
-    friendRequests      User[]  @relation("friendRequest")
-    friendRequestUser   User?   @relation("friendRequest", fields: [userFriendRequestId], references: [id])
-    userFriendRequestId String?
+    myFriends         User[] @relation("friend")
+    acceptedMyRequest User[] @relation("friend")
+    // friendUser   User?   @relation("friendActual", fields: [userFriendId], references: [id])
+    // userFriendId String?
+
+    // friendRequestUser   User     @relation("friendRequest", fields: [userFriendRequestId], references: [id])
+    // userFriendRequestId String[]
 
     posts      Post[]    @relation("author")
     comments   Comment[]

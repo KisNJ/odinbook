@@ -2,7 +2,7 @@ import { Comment, User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { BsBoxArrowUpRight, BsThreeDots, BsTrash } from "react-icons/bs";
-import { trpc } from "../utils/trpc";
+import { trpc } from "../../utils/trpc";
 import cuid from "cuid";
 import { TbArrowForwardUp, TbOld } from "react-icons/tb";
 import Image from "next/image";
@@ -29,18 +29,16 @@ const CommentSection = ({
     onMutate: () => {
       ctx.cancelQuery(["main.posts"]);
       let optimisticUpdate = ctx.getQueryData(["main.posts"]);
-      const postIndex = optimisticUpdate!.posts.findIndex((posta) => {
+      const postIndex = optimisticUpdate!.posts?.findIndex((posta) => {
         return postId === posta.id;
       });
-      optimisticUpdate!.posts[postIndex]?.comments.push({
+      optimisticUpdate!.posts![postIndex as number]?.comments.push({
         author: {
           id: session?.user?.id as string,
           name: session?.user?.name as string,
           email: session?.user?.email as string,
           emailVerified: new Date(2022, 10, 11),
           image: session?.user?.image as string,
-          userFriendId: "",
-          userFriendRequestId: "",
         },
         userId: session?.user?.id as string,
         content: newCommentData.content,
@@ -52,7 +50,7 @@ const CommentSection = ({
       if (optimisticUpdate) {
         ctx.setQueryData(["main.posts"], optimisticUpdate);
       }
-      setNewCommentData((old) => ({ ...old, content: "" }));
+      setNewCommentData((old) => ({ ...old, content: "", idNew: cuid() }));
     },
     onSettled: () => {
       ctx.invalidateQueries(["main.posts"]);
@@ -119,11 +117,11 @@ const Comment = ({
     onMutate: () => {
       ctx.cancelQuery(["main.posts"]);
       let optimisticUpdate = ctx.getQueryData(["main.posts"]);
-      let indexPost = optimisticUpdate?.posts.findIndex(
+      let indexPost = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === postId,
       );
-      optimisticUpdate!.posts[indexPost as number]!.comments =
-        optimisticUpdate!.posts[indexPost as number]!.comments.filter((c) => {
+      optimisticUpdate!.posts![indexPost as number]!.comments =
+        optimisticUpdate!.posts![indexPost as number]!.comments.filter((c) => {
           return c.id !== comment.id;
         });
       if (optimisticUpdate) {
@@ -145,16 +143,16 @@ const Comment = ({
     onMutate: () => {
       ctx.cancelQuery(["main.posts"]);
       let optimisticUpdate = ctx.getQueryData(["main.posts"]);
-      let indexPost = optimisticUpdate?.posts.findIndex(
+      let indexPost = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === postId,
       );
       let indexComment = optimisticUpdate!.posts![
         indexPost as number
       ]?.comments.findIndex((c) => c.id === comment.id);
-      optimisticUpdate!.posts[indexPost as number]!.comments[
+      optimisticUpdate!.posts![indexPost as number]!.comments[
         indexComment as number
       ] = {
-        ...optimisticUpdate!.posts[indexPost as number]!.comments[
+        ...optimisticUpdate!.posts![indexPost as number]!.comments[
           indexComment as number
         ],
         content: formData.content,

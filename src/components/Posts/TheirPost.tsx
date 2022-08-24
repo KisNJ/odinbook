@@ -5,10 +5,12 @@ import { BsThreeDots, BsTrash } from "react-icons/bs";
 import { TbArrowForwardUp } from "react-icons/tb";
 import React, { useState } from "react";
 import { AiOutlineLike, AiFillLike } from "react-icons/ai";
-import { trpc } from "../utils/trpc";
-import CommentSection from "./CommentSection";
-const Post = ({
+import { trpc } from "../../utils/trpc";
+import CommentSection from "../CommentSections/CommentSection";
+import CommentSectionThem from "../CommentSections/CommentSectionThem";
+const TheirPost = ({
   post,
+  userId,
 }: {
   post: Post & {
     author: User;
@@ -17,6 +19,7 @@ const Post = ({
     })[];
     likes: User[];
   };
+  userId: string;
 }) => {
   const { data: session, status } = useSession();
   const ctx = trpc.useContext();
@@ -28,28 +31,38 @@ const Post = ({
   const [showComments, setShowComments] = useState(false);
   const updatePost = trpc.useMutation("post.updatePost", {
     onMutate: () => {
-      ctx.cancelQuery(["main.posts"]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      ctx.cancelQuery(["main.posts", { type: "THEIRS", userId }]);
+      let optimisticUpdate = ctx.getQueryData([
+        "main.posts",
+        { type: "THEIRS", userId },
+      ]);
 
-      let index = optimisticUpdate?.posts.findIndex(
+      let index = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
-      optimisticUpdate!.posts[index as number] = {
-        ...(optimisticUpdate!.posts![index as number]! as unknown as Post & {
-          author: User;
+      optimisticUpdate!.userData!.posts![index as number] = {
+        ...(optimisticUpdate!.userData!.posts![
+          index as number
+        ] as unknown as Post & {
           comments: (Comment & {
             author: User;
           })[];
+          author: User & {
+            friendRequests: User[];
+          };
           likes: User[];
         }),
         ...formData,
       };
       if (optimisticUpdate) {
-        ctx.setQueryData(["main.posts"], optimisticUpdate);
+        ctx.setQueryData(
+          ["main.posts", { type: "THEIRS", userId }],
+          optimisticUpdate,
+        );
       }
     },
     onSettled: () => {
-      ctx.invalidateQueries(["main.posts"]);
+      ctx.invalidateQueries(["main.posts", { type: "THEIRS", userId }]);
     },
   });
 
@@ -69,71 +82,92 @@ const Post = ({
   const addLike = trpc.useMutation("post.addLike", {
     onMutate: () => {
       setLiked(true);
-      ctx.cancelQuery(["main.posts"]);
+      ctx.cancelQuery(["main.posts", { type: "THEIRS", userId }]);
 
-      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      let optimisticUpdate = ctx.getQueryData([
+        "main.posts",
+        { type: "THEIRS", userId },
+      ]);
 
-      let index = optimisticUpdate?.posts.findIndex(
+      let index = optimisticUpdate?.userData?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
-      optimisticUpdate!.posts[index as number]!.likes = [
-        ...(optimisticUpdate?.posts[index as number]?.likes as User[]),
+      console.log("---");
+      console.log(optimisticUpdate);
+      optimisticUpdate!.userData!.posts![index as number]!.likes = [
+        ...(optimisticUpdate?.userData?.posts![index as number]
+          ?.likes as User[]),
         {
           id: session?.user?.id as string,
           name: session?.user?.name as string,
           email: session?.user?.email as string,
           emailVerified: new Date(2022, 10, 11),
           image: session?.user?.image as string,
-          userFriendId: "",
-          userFriendRequestId: "",
         },
       ];
       if (optimisticUpdate) {
-        ctx.setQueryData(["main.posts"], optimisticUpdate);
+        ctx.setQueryData(
+          ["main.posts", { type: "THEIRS", userId }],
+          optimisticUpdate,
+        );
       }
     },
     onSettled: () => {
-      ctx.invalidateQueries(["main.posts"]);
+      ctx.invalidateQueries(["main.posts", { type: "THEIRS", userId }]);
     },
   });
   const removeLike = trpc.useMutation("post.removeLike", {
     onMutate: () => {
       setLiked(false);
-      ctx.cancelQuery(["main.posts"]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
-      let index = optimisticUpdate?.posts.findIndex(
+      ctx.cancelQuery(["main.posts", { type: "THEIRS", userId }]);
+      let optimisticUpdate = ctx.getQueryData([
+        "main.posts",
+        { type: "THEIRS", userId },
+      ]);
+      let index = optimisticUpdate?.userData?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
-      optimisticUpdate!.posts[index as number]!.likes = optimisticUpdate!.posts[
-        index as number
-      ]!.likes.filter((liked) => {
-        return liked.id !== session?.user?.id;
-      });
+      optimisticUpdate!.userData!.posts![index as number]!.likes =
+        optimisticUpdate!.userData!.posts![index as number]!.likes.filter(
+          (liked) => {
+            return liked.id !== session?.user?.id;
+          },
+        );
 
       if (optimisticUpdate) {
-        ctx.setQueryData(["main.posts"], optimisticUpdate);
+        ctx.setQueryData(
+          ["main.posts", { type: "THEIRS", userId }],
+          optimisticUpdate,
+        );
       }
     },
     onSettled: () => {
-      ctx.invalidateQueries(["main.posts"]);
+      ctx.invalidateQueries(["main.posts", { type: "THEIRS", userId }]);
     },
     // },
   });
   const deletePost = trpc.useMutation("post.deletePost", {
     onMutate: () => {
-      ctx.cancelQuery(["main.posts"]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      ctx.cancelQuery(["main.posts", { type: "THEIRS", userId }]);
+      let optimisticUpdate = ctx.getQueryData([
+        "main.posts",
+        { type: "THEIRS", userId },
+      ]);
 
-      optimisticUpdate!.posts = optimisticUpdate!.posts.filter((posta) => {
-        return post.id !== posta.id;
-      });
+      optimisticUpdate!.userData!.posts =
+        optimisticUpdate!.userData!.posts?.filter((posta) => {
+          return post.id !== posta.id;
+        });
 
       if (optimisticUpdate) {
-        ctx.setQueryData(["main.posts"], optimisticUpdate);
+        ctx.setQueryData(
+          ["main.posts", { type: "THEIRS", userId }],
+          optimisticUpdate,
+        );
       }
     },
     onSettled: () => {
-      ctx.invalidateQueries(["main.posts"]);
+      ctx.invalidateQueries(["main.posts", { type: "THEIRS", userId }]);
     },
     // },
   });
@@ -265,7 +299,8 @@ const Post = ({
           Comments ({post.comments.length})
         </button>
       </h2>
-      <CommentSection
+      <CommentSectionThem
+        userId={userId}
         comments={post.comments}
         postId={post.id}
         expandMaxHeight={showComments}
@@ -274,4 +309,4 @@ const Post = ({
   );
 };
 
-export default Post;
+export default TheirPost;
