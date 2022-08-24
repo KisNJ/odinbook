@@ -184,5 +184,18 @@ export const queryUsers = createProtectedRouter()
           },
         },
       });
+      await ctx.prisma.user.update({
+        where: {
+          id: input.userId,
+        },
+        data: {
+          myFriends: {
+            disconnect: { id: ctx.session.user.id },
+          },
+          acceptedMyRequest: {
+            disconnect: { id: ctx.session.user.id },
+          },
+        },
+      });
     },
   });

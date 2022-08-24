@@ -59,12 +59,86 @@ const UserPage = () => {
       ctx.invalidateQueries(["search.getUserData"]);
     },
   });
-
+  const removeFriend = trpc.useMutation("search.removeFriend", {
+    onMutate: () => {
+      ctx.cancelQuery(["search.getUserData"]);
+      let optimisticUpdate = ctx.getQueryData([
+        "search.getUserData",
+        { userId: id as string },
+      ]);
+      optimisticUpdate!.isFriend = false;
+      if (optimisticUpdate) {
+        ctx.setQueryData(["search.getUserData"], optimisticUpdate);
+      }
+    },
+    onSettled: () => {
+      ctx.invalidateQueries(["search.getUserData"]);
+    },
+  });
+  function handleRemoveFriend() {
+    removeFriend.mutate({ userId: id as string });
+  }
   function handleSendFriendRequest() {
     sendFriendRequest.mutate({ userId: id as string });
   }
   function handleCancelFriendRequest() {
     cancelFriendRequest.mutate({ userId: id as string });
+  }
+  const acceptRequest = trpc.useMutation("search.acceptRequest", {
+    onMutate: () => {
+      ctx.cancelQuery(["search.getUserData", { userId: id as string }]);
+
+      let optimisticUpdate = ctx.getQueryData([
+        "search.getUserData",
+        { userId: id as string },
+      ]);
+      optimisticUpdate!.isFriend = true;
+      optimisticUpdate!.recievedRequestFromThem = false;
+      optimisticUpdate!.sentRequest = false;
+
+      if (optimisticUpdate) {
+        ctx.setQueryData(
+          ["search.getUserData", { userId: id as string }],
+          optimisticUpdate,
+        );
+      }
+    },
+    onSettled: () => {
+      ctx.invalidateQueries(["search.getUserData", { userId: id as string }]);
+      ctx.invalidateQueries([
+        "main.posts",
+        { type: "THEIRS", userId: id as string },
+      ]);
+    },
+  });
+  const declineRequest = trpc.useMutation("search.declineRequest", {
+    onMutate: () => {
+      ctx.cancelQuery(["search.getUserData", { userId: id as string }]);
+
+      let optimisticUpdate = ctx.getQueryData([
+        "search.getUserData",
+        { userId: id as string },
+      ]);
+      optimisticUpdate!.isFriend = false;
+      optimisticUpdate!.recievedRequestFromThem = false;
+      optimisticUpdate!.sentRequest = false;
+
+      if (optimisticUpdate) {
+        ctx.setQueryData(
+          ["search.getUserData", { userId: id as string }],
+          optimisticUpdate,
+        );
+      }
+    },
+    onSettled: () => {
+      ctx.invalidateQueries(["search.getUserData", { userId: id as string }]);
+    },
+  });
+  function handleDecline() {
+    declineRequest.mutate({ userId: id as string });
+  }
+  function handleAccept() {
+    acceptRequest.mutate({ userId: id as string });
   }
   if (isLoading) return <div>Loading...</div>;
   return (
@@ -76,14 +150,14 @@ const UserPage = () => {
       />
       {data?.isFriend ? (
         <>
-          <button>Remove Friend</button>
+          <button onClick={handleRemoveFriend}>Remove Friend</button>
         </>
       ) : (
         <>
           {data?.recievedRequestFromThem ? (
             <>
-              <button>Decline</button>
-              <button>Accept</button>
+              <button onClick={handleDecline}>Decline</button>
+              <button onClick={handleAccept}>Accept</button>
             </>
           ) : data?.sentRequest ? (
             <button onClick={handleCancelFriendRequest}>Cancel Request</button>
@@ -95,7 +169,7 @@ const UserPage = () => {
         </>
       )}
       {data?.isFriend &&
-        posts.data?.userData?.posts.map((post) => (
+        posts.data?.posts.map((post) => (
           <TheirPost post={post} key={post.id} userId={id as string} />
         ))}
     </>

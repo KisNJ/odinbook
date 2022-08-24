@@ -69,9 +69,7 @@ export const mainPageRouter = createProtectedRouter()
           where: { id: input.userId as string },
           include: {
             myFriends: true,
-            friendRequests: true,
             acceptedMyRequest: true,
-            sentFriendRequests: true,
           },
         });
         if (userToDisplay === null) {
@@ -85,31 +83,36 @@ export const mainPageRouter = createProtectedRouter()
         );
         if (indexOfFriend >= 0 || indexOfFriend2 >= 0) {
           return {
-            userData: await ctx.prisma.user.findUnique({
-              where: { id: input.userId },
-              include: {
-                myFriends: true,
-                posts: {
-                  include: {
-                    author: {
-                      include: {
-                        friendRequests: true,
-                      },
-                    },
-                    comments: {
-                      include: {
-                        author: true,
-                      },
-                      orderBy: {
-                        createdAt: "desc",
-                      },
-                    },
-                    likes: true,
+            posts: await ctx.prisma.post.findMany({
+              where: {
+                author: {
+                  is: {
+                    id: input.userId,
                   },
                 },
               },
+              orderBy: [
+                {
+                  createdAt: "desc",
+                },
+              ],
+              include: {
+                author: {
+                  include: {
+                    friendRequests: true,
+                  },
+                },
+                comments: {
+                  include: {
+                    author: true,
+                  },
+                  orderBy: {
+                    createdAt: "desc",
+                  },
+                },
+                likes: true,
+              },
             }),
-            isFriend: true,
           };
         } else {
           throw new trpc.TRPCError({ code: "UNAUTHORIZED" });

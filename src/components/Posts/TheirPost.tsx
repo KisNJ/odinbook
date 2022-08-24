@@ -40,10 +40,8 @@ const TheirPost = ({
       let index = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
-      optimisticUpdate!.userData!.posts![index as number] = {
-        ...(optimisticUpdate!.userData!.posts![
-          index as number
-        ] as unknown as Post & {
+      optimisticUpdate!.posts![index as number] = {
+        ...(optimisticUpdate!.posts![index as number] as unknown as Post & {
           comments: (Comment & {
             author: User;
           })[];
@@ -89,14 +87,13 @@ const TheirPost = ({
         { type: "THEIRS", userId },
       ]);
 
-      let index = optimisticUpdate?.userData?.posts?.findIndex(
+      let index = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
       console.log("---");
       console.log(optimisticUpdate);
-      optimisticUpdate!.userData!.posts![index as number]!.likes = [
-        ...(optimisticUpdate?.userData?.posts![index as number]
-          ?.likes as User[]),
+      optimisticUpdate!.posts![index as number]!.likes = [
+        ...(optimisticUpdate?.posts![index as number]?.likes as User[]),
         {
           id: session?.user?.id as string,
           name: session?.user?.name as string,
@@ -124,15 +121,13 @@ const TheirPost = ({
         "main.posts",
         { type: "THEIRS", userId },
       ]);
-      let index = optimisticUpdate?.userData?.posts?.findIndex(
+      let index = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
-      optimisticUpdate!.userData!.posts![index as number]!.likes =
-        optimisticUpdate!.userData!.posts![index as number]!.likes.filter(
-          (liked) => {
-            return liked.id !== session?.user?.id;
-          },
-        );
+      optimisticUpdate!.posts![index as number]!.likes =
+        optimisticUpdate!.posts![index as number]!.likes.filter((liked) => {
+          return liked.id !== session?.user?.id;
+        });
 
       if (optimisticUpdate) {
         ctx.setQueryData(
@@ -154,10 +149,9 @@ const TheirPost = ({
         { type: "THEIRS", userId },
       ]);
 
-      optimisticUpdate!.userData!.posts =
-        optimisticUpdate!.userData!.posts?.filter((posta) => {
-          return post.id !== posta.id;
-        });
+      optimisticUpdate!.posts = optimisticUpdate!.posts?.filter((posta) => {
+        return post.id !== posta.id;
+      });
 
       if (optimisticUpdate) {
         ctx.setQueryData(

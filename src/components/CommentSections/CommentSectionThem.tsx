@@ -34,12 +34,10 @@ const CommentSectionThem = ({
         "main.posts",
         { type: "THEIRS", userId },
       ]);
-      const postIndex = optimisticUpdate!.userData?.posts?.findIndex(
-        (posta) => {
-          return postId === posta.id;
-        },
-      );
-      optimisticUpdate!.userData!.posts![postIndex as number]?.comments.push({
+      const postIndex = optimisticUpdate!.posts?.findIndex((posta) => {
+        return postId === posta.id;
+      });
+      optimisticUpdate!.posts![postIndex as number]?.comments.push({
         author: {
           id: session?.user?.id as string,
           name: session?.user?.name as string,
@@ -137,13 +135,11 @@ const Comment = ({
         "main.posts",
         { type: "THEIRS", userId },
       ]);
-      let indexPost = optimisticUpdate?.userData?.posts?.findIndex(
+      let indexPost = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === postId,
       );
-      optimisticUpdate!.userData!.posts![indexPost as number]!.comments =
-        optimisticUpdate!.userData!.posts![
-          indexPost as number
-        ]!.comments.filter((c) => {
+      optimisticUpdate!.posts![indexPost as number]!.comments =
+        optimisticUpdate!.posts![indexPost as number]!.comments.filter((c) => {
           return c.id !== comment.id;
         });
       if (optimisticUpdate) {
@@ -171,16 +167,16 @@ const Comment = ({
         "main.posts",
         { type: "THEIRS", userId },
       ]);
-      let indexPost = optimisticUpdate?.userData?.posts.findIndex(
+      let indexPost = optimisticUpdate?.posts.findIndex(
         (posta) => posta.id === postId,
       );
-      let indexComment = optimisticUpdate!.userData!.posts![
+      let indexComment = optimisticUpdate!.posts![
         indexPost as number
       ]?.comments.findIndex((c) => c.id === comment.id);
-      optimisticUpdate!.userData!.posts![indexPost as number]!.comments[
+      optimisticUpdate!.posts![indexPost as number]!.comments[
         indexComment as number
       ] = {
-        ...optimisticUpdate!.userData!.posts![indexPost as number]!.comments[
+        ...optimisticUpdate!.posts![indexPost as number]!.comments[
           indexComment as number
         ],
         content: formData.content,
