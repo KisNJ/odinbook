@@ -7,6 +7,7 @@ import Header from "../../components/Header";
 import ProfileHeader from "../../components/ProfileHeader";
 import TheirPost from "../../components/Posts/TheirPost";
 import { trpc } from "../../utils/trpc";
+import Spinner from "../../components/Spinner";
 
 const UserPage = () => {
   const router = useRouter();
@@ -18,7 +19,7 @@ const UserPage = () => {
     { type: "THEIRS", userId: id as string },
   ]);
   useEffect(() => {
-    if (id === session?.user?.id) {
+    if (id !== undefined && id === session?.user?.id) {
       Router.push(`/myprofile/${id}`);
     }
   }, []);
@@ -35,6 +36,7 @@ const UserPage = () => {
         { userId: id as string },
       ]);
       optimisticUpdate!.sentRequest = true;
+      console.log(optimisticUpdate);
       if (optimisticUpdate) {
         ctx.setQueryData(["search.getUserData"], optimisticUpdate);
       }
@@ -140,7 +142,18 @@ const UserPage = () => {
   function handleAccept() {
     acceptRequest.mutate({ userId: id as string });
   }
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    if (id !== undefined && id === session?.user?.id) {
+      Router.push(`/myprofile/${id}`);
+    }
+    return <Spinner />;
+  }
+  if (posts.isLoading) {
+    if (id !== undefined && id === session?.user?.id) {
+      Router.push(`/myprofile/${id}`);
+    }
+    return <Spinner />;
+  }
   return (
     <>
       <Header />
@@ -148,26 +161,51 @@ const UserPage = () => {
         imgURL={data?.userData?.image as string}
         name={data?.userData?.name as string}
       />
-      {data?.isFriend ? (
-        <>
-          <button onClick={handleRemoveFriend}>Remove Friend</button>
-        </>
-      ) : (
-        <>
-          {data?.recievedRequestFromThem ? (
-            <>
-              <button onClick={handleDecline}>Decline</button>
-              <button onClick={handleAccept}>Accept</button>
-            </>
-          ) : data?.sentRequest ? (
-            <button onClick={handleCancelFriendRequest}>Cancel Request</button>
-          ) : (
-            <button onClick={handleSendFriendRequest}>
-              Send Friend Request
+      <div className="max-w-5xl flex gap-2 bg-sky-100 px-5 py-10 shadow-xl rounded-md mt-10 mx-20 xl:mx-auto justify-center">
+        {data?.isFriend ? (
+          <>
+            <button
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              onClick={handleRemoveFriend}
+            >
+              Remove Friend
             </button>
-          )}
-        </>
-      )}
+          </>
+        ) : (
+          <>
+            {data?.recievedRequestFromThem ? (
+              <>
+                <button
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={handleDecline}
+                >
+                  Decline
+                </button>
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={handleAccept}
+                >
+                  Accept
+                </button>
+              </>
+            ) : data?.sentRequest ? (
+              <button
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleCancelFriendRequest}
+              >
+                Cancel Request
+              </button>
+            ) : (
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleSendFriendRequest}
+              >
+                Send Friend Request
+              </button>
+            )}
+          </>
+        )}
+      </div>
       {data?.isFriend &&
         posts.data?.posts.map((post) => (
           <TheirPost post={post} key={post.id} userId={id as string} />

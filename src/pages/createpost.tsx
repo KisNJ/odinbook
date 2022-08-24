@@ -3,24 +3,28 @@ import Image from "next/image";
 import Router from "next/router";
 import React, { useState } from "react";
 import Header from "../components/Header";
+import Spinner from "../components/Spinner";
 import { trpc } from "../utils/trpc";
 
 const createpost = () => {
   const { data: session, status } = useSession();
   const createPost = trpc.useMutation("post.createPost");
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     location: "",
     content: "",
   });
-  if (status === "loading") {
-    return <main>Loading...</main>;
+  if (status === "loading" || loading) {
+    return <Spinner />;
   }
 
   function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
+    setLoading(true);
     createPost.mutate(formData, {
       onSuccess: () => {
+        setLoading(false);
         Router.push("/");
       },
     });

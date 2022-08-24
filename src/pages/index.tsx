@@ -3,11 +3,12 @@ import { signIn, useSession, signOut } from "next-auth/react";
 import Head from "next/head";
 
 import Router from "next/router";
+import Spinner from "../components/Spinner";
 
 const Home: NextPage = () => {
   const { data: session, status } = useSession();
   if (status === "loading") {
-    return <main>Loading...</main>;
+    return <Spinner />;
   }
   function moveToMainPage() {
     Router.push("/mainpage");
@@ -20,13 +21,17 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="container mx-auto flex flex-col items-center justify-center min-h-screen p-4">
-        <h1>Welcome to OdinBook</h1>
+      <main className="container  flex flex-col items-center justify-center min-h-screen min-w-full p-4 bg-sky-200">
+        <h1 className="text-4xl font-bold mb-2">Welcome to OdinBook</h1>
         {!session ? (
           <>
-            <div>{JSON.stringify(session)}</div>
-            <h2>LogIn to continue</h2>
-            <button onClick={() => signIn("google")}>Login with Google</button>
+            <h2 className="text-2xl font-bold mb-4">Login to continue</h2>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={() => signIn("google")}
+            >
+              Login with Google
+            </button>
             {/* <button onClick={() => signOut()}>Log out</button> */}
           </>
         ) : (

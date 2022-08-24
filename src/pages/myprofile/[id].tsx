@@ -6,6 +6,7 @@ import Image from "next/image";
 import ProfileHeader from "../../components/ProfileHeader";
 import MyPost from "../../components/Posts/MyPosts";
 import { User } from "@prisma/client";
+import Spinner from "../../components/Spinner";
 const ProfilePage = () => {
   const router = useRouter();
   const ctx = trpc.useContext();
@@ -64,7 +65,7 @@ const ProfilePage = () => {
     function handleAccept() {
       acceptRequest.mutate({ userId: user.id });
     }
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading || posts.isLoading) return <Spinner />;
     return (
       <div className="max-w-5xl flex items-center  gap-4 bg-sky-300 text-slate-900  px-5 py-2 shadow-xl rounded-md md mt-2 mx-20  xl:mx-auto">
         <button onClick={navigate}>
@@ -76,12 +77,24 @@ const ProfilePage = () => {
           />
           <div className="font-bold text-2xl">{user.name}</div>
         </button>
-
-        <button onClick={handleDecline}>Decline Request</button>
-        <button onClick={handleAccept}>Accept Request</button>
+        <div className="ml-auto flex gap-2">
+          <button
+            onClick={handleDecline}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Decline Request
+          </button>
+          <button
+            onClick={handleAccept}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Accept Request
+          </button>
+        </div>
       </div>
     );
   };
+  if (posts.isLoading) return <Spinner />;
   return (
     <>
       <Header />

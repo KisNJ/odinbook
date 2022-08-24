@@ -8,6 +8,7 @@ import { trpc } from "../utils/trpc";
 import Image from "next/image";
 import { User } from "@prisma/client";
 import Link from "next/link";
+import Spinner from "./Spinner";
 
 function handleSignOut() {
   signOut({ callbackUrl: "/" });
@@ -40,7 +41,7 @@ const Header = ({ back_to_main }: { back_to_main?: boolean }) => {
   const { data: session, status } = useSession();
   const [searchUserData, setSearchUserData] = useState("");
   const ctx = trpc.useContext();
-  const { data, refetch } = trpc.useQuery(
+  const { data, refetch, isLoading } = trpc.useQuery(
     [
       "search.searchUsers",
       {
@@ -58,10 +59,12 @@ const Header = ({ back_to_main }: { back_to_main?: boolean }) => {
     <header className="bg-sky-700 text-gray-100 flex justify-between items-center px-20 py-5 w-full">
       <Link href="/mainpage">
         <button>
-          <h1 className="text-3xl font-bold">{session?.user?.name}</h1>
+          <h1 className="text-4xl font-extrabold transition-all hover:text-transparent bg-clip-text bg-gradient-to-r from-red-200 to-orange-600">
+            {session?.user?.name}
+          </h1>
         </button>
       </Link>
-      <div className="flex gap-5 items-center relative md:basis-[40rem] lg:basis-[60rem] xl:basis-[70rem]">
+      <div className="flex gap-5 items-center relative lg:basis-[40rem] xl:basis-[70rem]">
         <BiSearch size={22} />
         <input
           type="text"
@@ -70,25 +73,34 @@ const Header = ({ back_to_main }: { back_to_main?: boolean }) => {
           onChange={(e) => setSearchUserData((old) => e.target.value)}
           className="border-neutral-800 border-spacing-1 border-2 rounded-md shadow-md p-2 mx-15 text-slate-900 justify-self-stretch w-full"
         />
-        <div className="absolute top-[150%] flex flex-col gap-2 bg-sky-100 py-2 shadow-xl rounded-md">
+        <div className="absolute top-[150%] flex flex-col gap-2 bg-sky-100 py-2 shadow-xl rounded-md z-50">
           {data?.possibleUsers.map((user) => (
             <UserCard key={user.id} user={user} />
           ))}
+          {isLoading && <Spinner />}
         </div>
         {/* <div>{JSON.stringify(data?.possibleUsers)}</div> */}
       </div>
       <div className="flex gap-10">
         {back_to_main ? (
-          <button className="text-xl" onClick={createGoToMainPageHandler}>
+          <button
+            className="text-xl focus:underline hover:underline underline-offset-3"
+            onClick={createGoToMainPageHandler}
+          >
             Go back to main page
           </button>
         ) : (
-          <button className="text-xl" onClick={createPostRouteHandler}>
+          <button
+            className="text-xl focus:underline hover:underline underline-offset-3"
+            onClick={createPostRouteHandler}
+          >
             Create Post
           </button>
         )}
         <div className="group relative">
-          <button className="text-xl">Profile</button>
+          <button className="text-xl focus:underline hover:underline underline-offset-3">
+            Profile
+          </button>
           <div className="absolute scale-0 group-focus-within:scale-100 bg-gray-100 text-sky-700 p-5 rounded-lg shadow-md right-[-45px] flex flex-col gap-2 truncate transition-transform mt-3">
             <button
               onClick={() => handleSignOut()}

@@ -6,7 +6,8 @@ import { trpc } from "../../utils/trpc";
 import cuid from "cuid";
 import { TbArrowForwardUp, TbOld } from "react-icons/tb";
 import Image from "next/image";
-
+import Spinner from "../Spinner";
+import Router from "next/router";
 const CommentSectionMine = ({
   comments,
   postId,
@@ -63,7 +64,7 @@ const CommentSectionMine = ({
       postId,
     });
   }
-  if (status === "loading") return <div>Loading ...</div>;
+  if (status === "loading") return <Spinner />;
   return (
     <>
       <label htmlFor="content" className="font-bold text-xl">
@@ -80,7 +81,7 @@ const CommentSectionMine = ({
       />
       <div>
         <button
-          className="flex gap-2 items-center"
+          className="flex gap-2 items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           onClick={handleAddNewComment}
         >
           Post Comment <BsBoxArrowUpRight />
@@ -171,19 +172,24 @@ const Comment = ({
   function handleUpdateComment() {
     updateComment.mutate({ content: formData.content, commentId: comment.id });
   }
-  if (status === "loading") return <div>Loading ...</div>;
+  function navigate() {
+    Router.push(`/user/${comment.author.id}`);
+  }
+  if (status === "loading") return <Spinner />;
   return (
     <div className="max-w-5xl flex flex-col gap-2 bg-sky-300 text-slate-900 px-5 py-10 shadow-xl rounded-md mt-10 mx-20 xl:mx-auto">
       <div className="flex items-center gap-2">
-        <Image
-          src={comment.author.image as string}
-          width={50}
-          height={50}
-          className="rounded-full shadow-sm"
-        />
-        <div>
-          <div>{comment.author.name}</div>
-        </div>
+        <button onClick={navigate}>
+          <Image
+            src={comment.author.image as string}
+            width={50}
+            height={50}
+            className="rounded-full shadow-sm"
+          />
+          <div>
+            <div>{comment.author.name}</div>
+          </div>
+        </button>
         {comment.author.id === session?.user?.id && (
           <div className="ml-auto mr-5 group relative">
             <button>

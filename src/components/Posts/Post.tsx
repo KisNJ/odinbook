@@ -5,8 +5,11 @@ import { BsThreeDots, BsTrash } from "react-icons/bs";
 import { TbArrowForwardUp } from "react-icons/tb";
 import React, { useState } from "react";
 import { AiOutlineLike, AiFillLike } from "react-icons/ai";
+import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { trpc } from "../../utils/trpc";
 import CommentSection from "../CommentSections/CommentSection";
+import Spinner from "../Spinner";
+import Router from "next/router";
 const Post = ({
   post,
 }: {
@@ -143,32 +146,39 @@ const Post = ({
   function handleDeletePost() {
     deletePost.mutate({ postId: post.id });
   }
-  if (status === "loading") return <div>Loading ...</div>;
+  function navigate() {
+    Router.push(`/user/${post.author.id}`);
+  }
+  if (status === "loading") return <Spinner />;
   return (
     <div className="max-w-5xl flex flex-col gap-2 bg-sky-100 px-5 py-10 shadow-xl rounded-md mt-10 mx-20 xl:mx-auto">
       <div className="flex items-center gap-2">
-        <Image
-          src={post.author.image as string}
-          width={50}
-          height={50}
-          className="rounded-full shadow-sm"
-        />
-        <div>
-          <div>{post.author.name}</div>
-          {post.location && !showUpdate && (
-            <div className="border-neutral-800 border-2 rounded-md shadow-md p-2">
-              {post.location}
-            </div>
-          )}
-          {post.location && showUpdate && (
-            <input
-              value={formData.location}
-              className="border-neutral-800 border-2 rounded-md shadow-md p-2"
-              id="location"
-              onChange={handleChange}
+        <button onClick={navigate}>
+          <div className="flex items-center gap-2">
+            <Image
+              src={post.author.image as string}
+              width={50}
+              height={50}
+              className="rounded-full shadow-sm"
             />
-          )}
-        </div>
+            <div>
+              <div>{post.author.name}</div>
+              {post.location && !showUpdate && (
+                <div className="border-neutral-800 border-2 rounded-md shadow-md p-2">
+                  {post.location}
+                </div>
+              )}
+              {post.location && showUpdate && (
+                <input
+                  value={formData.location}
+                  className="border-neutral-800 border-2 rounded-md shadow-md p-2"
+                  id="location"
+                  onChange={handleChange}
+                />
+              )}
+            </div>
+          </div>
+        </button>
         {post.author.id === session?.user?.id && (
           <div className="ml-auto mr-5 group relative">
             <button>
@@ -259,7 +269,16 @@ const Post = ({
       </div>
       <h2 className="mb-0 font-bold">
         <button onClick={() => setShowComments((o) => !o)}>
-          Comments ({post.comments.length})
+          <div className="flex gap-2 items-center">
+            <div>Comments ({post.comments.length})</div>
+            <div>
+              {showComments ? (
+                <FiChevronDown size={18} />
+              ) : (
+                <FiChevronUp size={18} />
+              )}
+            </div>
+          </div>
         </button>
       </h2>
       <CommentSection
