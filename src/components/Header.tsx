@@ -157,12 +157,16 @@ const Header = ({ back_to_main }: { back_to_main?: boolean }) => {
             />
           </div>
         </label>
-        <div className="absolute top-[150%] flex flex-col gap-2 bg-sky-100 py-2 shadow-xl rounded-md z-50 dropdown-content menu p-2">
-          {data?.possibleUsers.map((user) => (
-            <UserCard key={user.id} user={user} />
-          ))}
-        </div>
-        {isLoading && <Spinner />}
+        {searchUserData && (
+          <>
+            <div className="absolute top-[150%] flex flex-col gap-2 bg-sky-100 py-2 shadow-xl rounded-md z-50 dropdown-content menu p-2">
+              {data?.possibleUsers.map((user) => (
+                <UserCard key={user.id} user={user} />
+              ))}
+            </div>
+            {isLoading && <Spinner />}
+          </>
+        )}
       </div>
     </header>
   );
