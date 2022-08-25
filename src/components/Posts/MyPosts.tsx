@@ -33,9 +33,12 @@ const MyPost = ({
   const updatePost = trpc.useMutation("post.updatePost", {
     onMutate: () => {
       ctx.cancelQuery(["main.posts", { type: "MINE" }]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts", { type: "MINE" }]);
+      const optimisticUpdate = ctx.getQueryData([
+        "main.posts",
+        { type: "MINE" },
+      ]);
 
-      let index = optimisticUpdate?.posts?.findIndex(
+      const index = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
       optimisticUpdate!.posts![index as number] = {
@@ -75,9 +78,12 @@ const MyPost = ({
       setLiked(true);
       ctx.cancelQuery(["main.posts", { type: "MINE" }]);
 
-      let optimisticUpdate = ctx.getQueryData(["main.posts", { type: "MINE" }]);
+      const optimisticUpdate = ctx.getQueryData([
+        "main.posts",
+        { type: "MINE" },
+      ]);
 
-      let index = optimisticUpdate?.posts?.findIndex(
+      const index = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
       optimisticUpdate!.posts![index as number]!.likes = [
@@ -102,8 +108,11 @@ const MyPost = ({
     onMutate: () => {
       setLiked(false);
       ctx.cancelQuery(["main.posts", { type: "MINE" }]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts", { type: "MINE" }]);
-      let index = optimisticUpdate?.posts?.findIndex(
+      const optimisticUpdate = ctx.getQueryData([
+        "main.posts",
+        { type: "MINE" },
+      ]);
+      const index = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
       optimisticUpdate!.posts![index as number]!.likes =
@@ -123,7 +132,10 @@ const MyPost = ({
   const deletePost = trpc.useMutation("post.deletePost", {
     onMutate: () => {
       ctx.cancelQuery(["main.posts", { type: "MINE" }]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts", { type: "MINE" }]);
+      const optimisticUpdate = ctx.getQueryData([
+        "main.posts",
+        { type: "MINE" },
+      ]);
 
       optimisticUpdate!.posts = optimisticUpdate!.posts?.filter((posta) => {
         return post.id !== posta.id;
@@ -152,7 +164,7 @@ const MyPost = ({
   }
   if (status === "loading") return <Spinner />;
   return (
-    <div className="max-w-5xl flex flex-col gap-2 bg-sky-100 px-5 py-10 shadow-xl rounded-md mt-10 mx-20 xl:mx-auto">
+    <div className="max-w-5xl flex flex-col gap-2 bg-sky-100 md:px-5 py-10 px-2 shadow-xl rounded-md mt-10 mx-2 md:mx-20 xl:mx-auto">
       <div className="flex items-center gap-2">
         <button onClick={navigate} className="inline-block">
           <div className="flex items-center gap-2">

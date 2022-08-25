@@ -37,7 +37,7 @@ const Createpost = () => {
   return (
     <div>
       <Header back_to_main />
-      <div className="max-w-5xl flex flex-col gap-2 bg-sky-100 px-5 py-10 shadow-xl rounded-md mt-10 mx-20 xl:mx-auto">
+      <div className="max-w-5xl flex flex-col gap-2 bg-sky-100 md:px-5 py-10 px-2 shadow-xl rounded-md mt-10 mx-2 md:mx-20 xl:mx-auto">
         <div className="flex items-center gap-2">
           <Image
             src={session?.user?.image as string}

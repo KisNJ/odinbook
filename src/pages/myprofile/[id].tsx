@@ -67,7 +67,7 @@ const ProfilePage = () => {
     }
     if (isLoading || posts.isLoading) return <Spinner />;
     return (
-      <div className="max-w-5xl flex items-center  gap-4 bg-sky-300 text-slate-900  px-5 py-2 shadow-xl rounded-md md mt-2 mx-20  xl:mx-auto">
+      <div className="max-w-5xl flex flex-col gap-2 bg-sky-100 md:px-5 py-10 px-2 shadow-xl rounded-md mt-10 mx-2 md:mx-20 xl:mx-auto">
         <button onClick={navigate}>
           <Image
             src={user.image as string}
@@ -77,7 +77,7 @@ const ProfilePage = () => {
           />
           <div className="font-bold text-2xl">{user.name}</div>
         </button>
-        <div className="ml-auto flex gap-2">
+        <div className="max-w-5xl flex font-bold flex-col gap-2 bg-sky-100 md:px-5 py-2 px-2 shadow-xl rounded-md mt-10 mx-2 md:mx-20 xl:mx-auto">
           <button
             onClick={handleDecline}
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -102,37 +102,13 @@ const ProfilePage = () => {
         imgURL={data?.profile?.image as string}
         name={data?.profile?.name as string}
       />
-      <h2
-        className="max-w-5xl
-        bg-sky-100
-        px-5
-        py-2
-        shadow-xl
-        rounded-md
-        mt-10
-        mx-20
-        font-bold
-        text-2xl
-        xl:mx-auto"
-      >
+      <h2 className="max-w-5xl flex font-bold flex-col gap-2 bg-sky-100 md:px-5 py-2 px-2 shadow-xl rounded-md mt-10 mx-2 md:mx-20 xl:mx-auto">
         Friend Requests
       </h2>
       {posts.data?.friendRequests![0]!.friendRequests.map((user) => (
         <UserCard user={user} key={user.id} />
       ))}
-      <h2
-        className="max-w-5xl
-        bg-sky-100
-        px-5
-        py-2
-        shadow-xl
-        rounded-md
-        mt-10
-        mx-20
-        font-bold
-        text-2xl
-        xl:mx-auto"
-      >
+      <h2 className="max-w-5xl flex font-bold flex-col gap-2 bg-sky-100 md:px-5 py-2 px-2 shadow-xl rounded-md mt-10 mx-2 md:mx-20 xl:mx-auto">
         My Posts
       </h2>
       {posts.data?.posts?.map((post) => (

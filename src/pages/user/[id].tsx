@@ -31,7 +31,7 @@ const UserPage = () => {
   const sendFriendRequest = trpc.useMutation("search.sendRequest", {
     onMutate: () => {
       ctx.cancelQuery(["search.getUserData"]);
-      let optimisticUpdate = ctx.getQueryData([
+      const optimisticUpdate = ctx.getQueryData([
         "search.getUserData",
         { userId: id as string },
       ]);
@@ -48,7 +48,7 @@ const UserPage = () => {
   const cancelFriendRequest = trpc.useMutation("search.cancelRequest", {
     onMutate: () => {
       ctx.cancelQuery(["search.getUserData"]);
-      let optimisticUpdate = ctx.getQueryData([
+      const optimisticUpdate = ctx.getQueryData([
         "search.getUserData",
         { userId: id as string },
       ]);
@@ -64,7 +64,7 @@ const UserPage = () => {
   const removeFriend = trpc.useMutation("search.removeFriend", {
     onMutate: () => {
       ctx.cancelQuery(["search.getUserData"]);
-      let optimisticUpdate = ctx.getQueryData([
+      const optimisticUpdate = ctx.getQueryData([
         "search.getUserData",
         { userId: id as string },
       ]);
@@ -90,7 +90,7 @@ const UserPage = () => {
     onMutate: () => {
       ctx.cancelQuery(["search.getUserData", { userId: id as string }]);
 
-      let optimisticUpdate = ctx.getQueryData([
+      const optimisticUpdate = ctx.getQueryData([
         "search.getUserData",
         { userId: id as string },
       ]);
@@ -117,7 +117,7 @@ const UserPage = () => {
     onMutate: () => {
       ctx.cancelQuery(["search.getUserData", { userId: id as string }]);
 
-      let optimisticUpdate = ctx.getQueryData([
+      const optimisticUpdate = ctx.getQueryData([
         "search.getUserData",
         { userId: id as string },
       ]);

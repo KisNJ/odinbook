@@ -32,9 +32,9 @@ const Post = ({
   const updatePost = trpc.useMutation("post.updatePost", {
     onMutate: () => {
       ctx.cancelQuery(["main.posts"]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      const optimisticUpdate = ctx.getQueryData(["main.posts"]);
 
-      let index = optimisticUpdate?.posts?.findIndex(
+      const index = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
       optimisticUpdate!.posts![index as number] = {
@@ -74,9 +74,9 @@ const Post = ({
       setLiked(true);
       ctx.cancelQuery(["main.posts"]);
 
-      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      const optimisticUpdate = ctx.getQueryData(["main.posts"]);
 
-      let index = optimisticUpdate?.posts?.findIndex(
+      const index = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
       optimisticUpdate!.posts![index as number]!.likes = [
@@ -101,8 +101,8 @@ const Post = ({
     onMutate: () => {
       setLiked(false);
       ctx.cancelQuery(["main.posts"]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
-      let index = optimisticUpdate?.posts?.findIndex(
+      const optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      const index = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === post.id,
       );
       optimisticUpdate!.posts![index as number]!.likes =
@@ -122,7 +122,7 @@ const Post = ({
   const deletePost = trpc.useMutation("post.deletePost", {
     onMutate: () => {
       ctx.cancelQuery(["main.posts"]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      const optimisticUpdate = ctx.getQueryData(["main.posts"]);
 
       optimisticUpdate!.posts = optimisticUpdate!.posts?.filter((posta) => {
         return post.id !== posta.id;
@@ -151,7 +151,7 @@ const Post = ({
   }
   if (status === "loading") return <Spinner />;
   return (
-    <div className="max-w-5xl flex flex-col gap-2 bg-sky-100 px-5 py-10 shadow-xl rounded-md mt-10 mx-20 xl:mx-auto">
+    <div className="max-w-5xl flex flex-col gap-2 bg-sky-100 md:px-5 py-10 px-2 shadow-xl rounded-md mt-10 mx-2 md:mx-20 xl:mx-auto">
       <div className="flex items-center gap-2">
         <button onClick={navigate}>
           <div className="flex items-center gap-2">
@@ -159,6 +159,7 @@ const Post = ({
               src={post.author.image as string}
               width={50}
               height={50}
+              alt="user pic"
               className="rounded-full shadow-sm"
             />
             <div>
