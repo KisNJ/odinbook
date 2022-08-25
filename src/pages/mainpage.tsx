@@ -5,7 +5,7 @@ import Header from "../components/Header";
 import Post from "../components/Posts/Post";
 import Spinner from "../components/Spinner";
 
-const mainpage = () => {
+const Mainpage = () => {
   const posts = trpc.useQuery(["main.posts"]);
   const { data: session, status } = useSession();
   if (status === "loading" || posts.isLoading) {
@@ -21,4 +21,4 @@ const mainpage = () => {
   );
 };
 
-export default mainpage;
+export default Mainpage;

@@ -6,7 +6,7 @@ import Header from "../components/Header";
 import Spinner from "../components/Spinner";
 import { trpc } from "../utils/trpc";
 
-const createpost = () => {
+const Createpost = () => {
   const { data: session, status } = useSession();
   const createPost = trpc.useMutation("post.createPost");
   const [loading, setLoading] = useState(false);
@@ -85,4 +85,4 @@ const createpost = () => {
   );
 };
 
-export default createpost;
+export default Createpost;
