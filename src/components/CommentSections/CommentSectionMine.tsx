@@ -205,7 +205,7 @@ const Comment = ({
             <button>
               <BsThreeDots />
             </button>
-            <div className="scale-0 group-focus-within:scale-100 absolute bg-gray-100 text-sky-700 right-[-43px] flex flex-col gap-2 truncate mt-1 p-5 rounded-lg shadow-md transition-transform">
+            <div className="scale-0 group-focus-within:scale-100 absolute bg-gray-100 text-sky-700 md:right-[-43px] right-[-20px] flex flex-col gap-2 truncate mt-1 p-5 rounded-lg shadow-md transition-transform">
               <button>
                 <div
                   className="flex items-center gap-2 hover:text-rose-800
