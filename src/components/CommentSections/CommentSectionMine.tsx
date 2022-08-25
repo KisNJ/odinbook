@@ -186,13 +186,14 @@ const Comment = ({
   }
   if (status === "loading") return <Spinner />;
   return (
-    <div className="max-w-5xl flex flex-col gap-2 bg-sky-300 text-slate-900 px-5 py-10 shadow-xl rounded-md mt-10 mx-20 xl:mx-auto">
+    <div className="max-w-5xl flex flex-col gap-2 bg-sky-300 text-slate-900 px-5 py-10 shadow-xl rounded-md mt-10 md:mx-20 mx-3 xl:mx-auto">
       <div className="flex items-center gap-2">
         <button onClick={navigate}>
           <Image
             src={comment.author.image as string}
             width={50}
             height={50}
+            alt="user image"
             className="rounded-full shadow-sm"
           />
           <div>
