@@ -16,6 +16,7 @@ export const queryUsers = createProtectedRouter()
               mode: "insensitive",
             },
           },
+          select: { name: true, id: true, image: true },
         }),
       };
     },
@@ -55,6 +56,7 @@ export const queryUsers = createProtectedRouter()
         return {
           userData: await ctx.prisma.user.findUnique({
             where: { id: input.userId },
+            select: { name: true, id: true, image: true },
           }),
           isFriend: true,
         };
@@ -78,6 +80,7 @@ export const queryUsers = createProtectedRouter()
           where: {
             id: ctx.session.user.id,
           },
+          select: { name: true, id: true, image: true },
         }),
       };
     },

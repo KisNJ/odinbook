@@ -30,7 +30,7 @@ const CommentSection = ({
   const addNewComment = trpc.useMutation("post.createComment", {
     onMutate: () => {
       ctx.cancelQuery(["main.posts"]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      const optimisticUpdate = ctx.getQueryData(["main.posts"]);
       const postIndex = optimisticUpdate!.posts?.findIndex((posta) => {
         return postId === posta.id;
       });
@@ -118,8 +118,8 @@ const Comment = ({
   const delteComment = trpc.useMutation("post.deleteComment", {
     onMutate: () => {
       ctx.cancelQuery(["main.posts"]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
-      let indexPost = optimisticUpdate?.posts?.findIndex(
+      const optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      const indexPost = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === postId,
       );
       optimisticUpdate!.posts![indexPost as number]!.comments =
@@ -144,11 +144,11 @@ const Comment = ({
   const updateComment = trpc.useMutation("post.updateComment", {
     onMutate: () => {
       ctx.cancelQuery(["main.posts"]);
-      let optimisticUpdate = ctx.getQueryData(["main.posts"]);
-      let indexPost = optimisticUpdate?.posts?.findIndex(
+      const optimisticUpdate = ctx.getQueryData(["main.posts"]);
+      const indexPost = optimisticUpdate?.posts?.findIndex(
         (posta) => posta.id === postId,
       );
-      let indexComment = optimisticUpdate!.posts![
+      const indexComment = optimisticUpdate!.posts![
         indexPost as number
       ]?.comments.findIndex((c) => c.id === comment.id);
       optimisticUpdate!.posts![indexPost as number]!.comments[

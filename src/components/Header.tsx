@@ -9,6 +9,7 @@ import Image from "next/image";
 import { User } from "@prisma/client";
 import Link from "next/link";
 import Spinner from "./Spinner";
+import Head from "next/head";
 
 function handleSignOut() {
   signOut({ callbackUrl: "/" });
@@ -19,22 +20,35 @@ function createPostRouteHandler() {
 function createGoToMainPageHandler() {
   Router.push("/");
 }
-const UserCard = ({ user }: { user: User }) => {
+const UserCard = ({
+  user,
+}: {
+  user: {
+    name: string | null;
+    id: string;
+    image: string | null;
+  };
+}) => {
   function navigate() {
     Router.push(`/user/${user.id}`);
   }
   return (
-    <button onClick={navigate}>
-      <div className="flex items-center  gap-4 bg-sky-300 text-slate-900 px-5 py-1 shadow-xl rounded-md mx-2 hover:bg-sky-500 ">
-        <Image
-          src={user.image as string}
-          width={45}
-          height={45}
-          className="rounded-full"
-        />
-        <div className="font-bold text-2xl">{user.name}</div>
-      </div>
-    </button>
+    <>
+      <Head>
+        <title>OdinBook</title>
+      </Head>
+      <button onClick={navigate}>
+        <div className="flex items-center  gap-4 bg-sky-300 text-slate-900 px-5 py-1 shadow-xl rounded-md mx-2 hover:bg-sky-500 ">
+          <Image
+            src={user.image as string}
+            width={45}
+            height={45}
+            className="rounded-full"
+          />
+          <div className="font-bold text-2xl">{user.name}</div>
+        </div>
+      </button>
+    </>
   );
 };
 const Header = ({ back_to_main }: { back_to_main?: boolean }) => {
